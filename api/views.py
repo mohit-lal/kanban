@@ -1,9 +1,10 @@
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, authenticate
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from .serializers import *
 
@@ -42,10 +43,40 @@ class BoardListCreateAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return user.board_set.all()
+        return user.board_set.filter(deleted_at__isnull=True)
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+class BoardRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+    serializer_class = BoardSerializer
+
+    def get_queryset(self):
+        return self.request.user.board_set.filter(pk=self.kwargs.get('pk'), deleted_at__isnull=True)
+    
+class BoardAddMemberAPIView(RetrieveUpdateAPIView):
+    """
+        The user who created the board can only add 
+        other members.
+        Exception: cannot add self.
+
+    """
+    serializer_class = AddMemberSerializer
+    model = Board
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['board'] = self.get_object()
+        context['user'] = self.request.user
+        return context
+
+    def get_object(self):
+        return get_object_or_404(self.model, pk=self.kwargs.get('pk'), created_by=self.request.user, deleted_at__isnull=True)
+
+    def perform_update(self, serializer):
+        serializer.save()
 
 
 

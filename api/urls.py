@@ -9,4 +9,6 @@ urlpatterns = [
     path('test/', TestView.as_view(), name='test'),
 
     path('boards', BoardListCreateAPIView.as_view(), name='boards-list-create'),
+    path('board/<int:pk>', BoardRetrieveUpdateDestroyAPIView.as_view(), name='board-retrieve-update-delete'),
+    path('board/<int:pk>/add-members/', BoardAddMemberAPIView.as_view(), name='board-add-members'),
 ]

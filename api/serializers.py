@@ -9,16 +9,34 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username']
+        fields = ['id', 'first_name', 'last_name', 'username']
 
 class BoardSerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True)
 
     class Meta:
         model = Board
-        fields = ['title', 'visibility', 'description', 'members']
+        fields = ['id', 'title', 'visibility', 'description', 'members']
 
 class BoardCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = ['title', 'visibility', 'description']
+
+class AddMemberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Board
+        fields = ['members']
+
+    def validate(self, data):
+        board = self.context['board']
+        user = self.context['user']
+        
+        members = data.get('members')
+
+        if user in members:
+            raise serializers.ValidationError({'members':'Cannot add self.'})
+
+        board.members.add(*members)
+        return data
