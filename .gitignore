@@ -1,0 +1,8 @@
+__pycache__/
+.swp
+*.pyc
+migrations
+.idea/
+db.sqlite3
+.vscode
+media

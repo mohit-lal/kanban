@@ -72,6 +72,7 @@ class Task(TimeStamp):
 
     status = models.CharField(max_length=30, choices=TASK_STATUS)
     priority = models.CharField(max_length=30, choices=TASK_PRIORITY, default='Medium')
+    
     position = models.PositiveIntegerField(default=0)
 
     task_type = models.CharField(max_length=15, choices=TASK_TYPE, default='Task')
@@ -79,7 +80,7 @@ class Task(TimeStamp):
     attachment = models.FileField(null=True, blank=True)
     deadline = models.DateTimeField()
 
-    reporter = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    reporter = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tasks')
     column = models.ForeignKey(Column, on_delete=models.CASCADE)
 
     class Meta:
