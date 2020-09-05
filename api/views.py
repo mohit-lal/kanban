@@ -12,6 +12,7 @@ class TestView(APIView):
     authentication_classes = [SessionAuthentication]
 
     def get(self, request, *args, **kwargs):
+        print(request.user)
         pass
 
 class LoginView(APIView):
@@ -27,6 +28,25 @@ class LoginView(APIView):
             return Response({'status':'ok'}, 200)
 
         return Response({'error':'Username or password incorrect!!'}, 400)
+
+class BoardListCreateAPIView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+    serializer_class = BoardSerializer
+    create_serializer_class = BoardCreateSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return self.create_serializer_class
+        return self.serializer_class
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.board_set.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
 
 
 

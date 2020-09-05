@@ -38,7 +38,7 @@ class TimeStamp(models.Model):
 
 class Board(TimeStamp): # project
     title = models.CharField(max_length=255)
-    visibility = models.BooleanField(default=False)
+    visibility = models.BooleanField(default=True)
     description = models.TextField()
 
     members = models.ManyToManyField(User, related_name='boards')
@@ -50,7 +50,7 @@ class Board(TimeStamp): # project
         return self.title
 
     def board_short_name(self):
-        return "".join(list(map(lambda x: x[0], label.split(" "))))
+        return "".join(list(map(lambda x: x[0], self.title.split(" "))))
 
 
 class Column(TimeStamp):
