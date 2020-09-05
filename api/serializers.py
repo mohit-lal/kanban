@@ -40,3 +40,15 @@ class AddMemberSerializer(serializers.ModelSerializer):
 
         board.members.add(*members)
         return data
+
+class ColumnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Column
+        fields = ['id', 'title', 'position']
+
+
+class ColumnCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Column
+        fields = ['title']
+

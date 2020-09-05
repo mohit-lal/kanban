@@ -61,7 +61,6 @@ class BoardAddMemberAPIView(RetrieveUpdateAPIView):
         The user who created the board can only add 
         other members.
         Exception: cannot add self.
-
     """
     serializer_class = AddMemberSerializer
     model = Board
@@ -77,6 +76,34 @@ class BoardAddMemberAPIView(RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
+class ColumnListCreateAPIView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+    serializer_class = ColumnSerializer
+    create_serializer_class = ColumnCreateSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return self.create_serializer_class
+        return self.serializer_class
+
+    def get_queryset(self):
+        return Column.objects.filter(board__id=self.kwargs.get('pk'), created_by=self.request.user, deleted_at__isnull=True)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        board = get_object_or_404(Board, pk=self.kwargs.get('pk'), created_by=user)
+        serializer.save(board=board, created_by=user)
+
+class ColumnRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+    serializer_class = ColumnSerializer
+
+    def get_queryset(self):
+        return self.request.user.column_set.filter(board__id=self.kwargs.get('board_id'), created_by=self.request.user, deleted_at__isnull=True)
+    
 
 
 
