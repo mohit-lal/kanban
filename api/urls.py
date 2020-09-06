@@ -6,12 +6,21 @@ app_name = 'api'
 
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
-    path('test/', TestView.as_view(), name='test'),
+    path('logout', LogoutAPIView.as_view(), name='logout'),
 
-    path('boards', BoardListCreateAPIView.as_view(), name='boards-list-create'),
-    path('board/<int:pk>', BoardRetrieveUpdateDestroyAPIView.as_view(), name='board-retrieve-update-delete'),
-    path('board/<int:pk>/add-members/', BoardAddMemberAPIView.as_view(), name='board-add-members'),
+    path('my/boards', BoardListCreateAPIView.as_view(), name='my-boards-list-create'), #will only show boards created by logged in user.
+    path('my/board/<int:pk>', BoardRetrieveUpdateDestroyAPIView.as_view(), name='my-board-retrieve-update-delete'),
+    path('my/board/<int:pk>/add-members/', BoardAddMemberAPIView.as_view(), name='my-board-add-members'),
 
-    path('board/<int:pk>/columns', ColumnListCreateAPIView.as_view(), name='list-create-columns'),
-    path('board/<int:board_id>/column/<int:pk>', ColumnRetrieveUpdateDestroyAPIView.as_view(), name='column-retrieve-update-delete')
+    path('my/board/<int:pk>/columns', ColumnListCreateAPIView.as_view(), name='my-list-create-columns'),
+    path('my/board/<int:board_id>/column/<int:pk>', ColumnRetrieveUpdateDestroyAPIView.as_view(), name='my-column-retrieve-update-delete'),
+    # path('column/<int:pk>/update-position', )
+
+    path('column/<int:pk>/tasks', TaskCreateAPIView.as_view(), name='add-task-column'),
+
+    path('boards', BoardListAPIView.as_view(), name='boards-list'), #shows board the user is member of.
+    path('board/<int:pk>', BoardDetailAPIView.as_view(), name='board-detail'),
+
+
+
 ]

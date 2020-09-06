@@ -60,7 +60,7 @@ class Column(TimeStamp):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='columns')
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['position']
 
     def __str__(self):
         return self.title
@@ -81,7 +81,7 @@ class Task(TimeStamp):
     deadline = models.DateTimeField()
 
     reporter = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tasks')
-    column = models.ForeignKey(Column, on_delete=models.CASCADE)
+    column = models.ForeignKey(Column, on_delete=models.CASCADE, related_name='tasks')
 
     class Meta:
         ordering = ['-id']
@@ -92,7 +92,7 @@ class Task(TimeStamp):
     def save(self, *args, **kwargs):
         if not self.task_id:
             board_name = self.column.board.board_short_name()
-            self.task_id = board_name + "-" + self.pk
+            self.task_id = board_name + "-" + str(self.pk)
         
         super().save(*args, **kwargs)
 
