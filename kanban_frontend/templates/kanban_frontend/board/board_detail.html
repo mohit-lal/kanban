@@ -1,6 +1,21 @@
 {% extends 'kanban_frontend/layouts/base.html' %}
 {% block head %}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style>
+    .column {
+        background-color: #eff1f3;
+    }
+
+    .text-bold {
+        font-weight: 900;
+    }
+
+    .task-card {
+        background-color: white;
+        padding: 8px;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, .3);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -19,19 +34,171 @@
         <td id="description"></td>
     </tr>
 </table>
+<a class="btn btn-primary mb-3" id="add-column">Add Column</a>
+<div id="columns" class="row" style="flex-wrap: nowrap; overflow-x: scroll;">
 
-<div id="columns"></div>
+</div>
+{% endblock %}
+
+{% block modal %}
+<div class="modal" tabindex="-1" role="dialog" id="add-task-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="" method="POST" id="add-task-form" data-pk="">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="">Title</label> <small class="text-danger">*</small class="text-danger">
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Description</label>
+                        <input type="text" name="description" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Status</label>
+                        <select class="form-control" name="status">
+                            <option value="To Do">To Do</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                            <option value="Hold">Hold</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Priority</label>
+                        <select class="form-control" name="priority">
+                            <option value="Highest">Highest</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                            <option value="Lowest">Lowest</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Task Type</label>
+                        <select class="form-control" name="task_type">
+                            <option value="Story">Story</option>
+                            <option value="Bug">Bug</option>
+                            <option value="Epic">Epic</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Deadline</label><small class="text-danger">*</small class="text-danger">
+                        <input type="text" name="deadline" class="form-control" placeholder="YYY-MM-DD" id="deadline">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Add Column -->
+<div class="modal" tabindex="-1" role="dialog" id="add-column-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Column</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="" method="POST" id="add-column-form">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="">Title</label> <small class="text-danger">*</small class="text-danger">
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<!-- ./Add Column Form -->
 {% endblock %}
 
 {% block script %}
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": '{{csrf_token}}' }
+    });
+
+
+    const plusIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#03A9F4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z"/>
+                        <circle cx="12" cy="12" r="9" />
+                        <line x1="9" y1="12" x2="15" y2="12" />
+                        <line x1="12" y1="9" x2="12" y2="15" />
+                        </svg>`
+
     const current_url = window.location.pathname;
     const pk = current_url.substring(current_url.lastIndexOf('/') + 1);
 
     const url = `{% url 'api:my-board-retrieve-update-delete' 123 %}`.replace(123, pk);
+    const addColumnUrl = `{% url 'api:my-list-create-columns' 123 %}`.replace(123, pk);
+
+    function taskCard(data) {
+        return `<div class="task-card">
+            <div class="">
+                <p class="card-title text-bold d-flex justify-content-between">${data.title}</p>
+                <p class="border-bottom">${data.description}</p>
+                <small>Priority : <strong>${data.priority}</strong> </small><br>
+                <small>Task Type: ${data.task_type}</small><br>
+                <small>Status : ${data.status}</small><br>
+                <small>Deadline : ${data.deadline}</small><br>
+                <small>Added By : ${data.reporter}</small><br>
+            </div>
+        </div>`
+    }
+
+    function buildTaskCards(tasks) {
+        return tasks.map((task, i) => taskCard(task));
+    }
+
+    function buildColumn(column) {
+        return `<div class="col">
+            <div class="card column" style="width:18rem">
+                <div class="card-body">
+                    <h5 class="card-title text-bold border-bottom d-flex justify-content-between">${column.title} <span data-pk=${column.id} class="add-task">${plusIcon}</span></h5>
+                    <div id="column_${column.id}">
+                        ${(column.tasks) ? buildTaskCards(column.tasks) : ''}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function buildColumns(columns) {
+        columns.map((column, i) => {
+            $('#columns').append(buildColumn(column));
+        })
+    }
 
     $.get(url, function (data) {
+
         const title = data.title;
         const visibility = data.visibility;
         const description = data.description;
@@ -40,6 +207,61 @@
         $('#visibility').text(visibility);
         $('#description').text(description);
 
+        const columns = data.columns;
+        buildColumns(columns);
+
     })
+
+    $('#add-column').click(function (e) {
+        e.preventDefault();
+        $('#add-column-modal').modal('show');
+    });
+
+    $('body').on('click', '.add-task', function (e) {
+        $('#add-task-modal').modal('show');
+        const pk = $(this).data('pk')
+        $('#add-task-form').data('pk', pk)
+    })
+
+    // add task
+    $('#add-task-form').submit(function (e) {
+        e.preventDefault();
+        const columnPk = $(this).data('pk');
+        const url = `{% url 'api:add-task-column' 1234 %}`.replace(1234, columnPk);
+        const data = $(this).serialize();
+
+        $.post(url, data, function (data) {
+            $(`#column_${columnPk}`).append(taskCard(data));
+            $('#add-task-modal').modal('hide');
+        }).fail(function (response) {
+            $('.error_text').remove();
+            const errors = response.responseJSON;
+            for (let key in errors) {
+                $(`#${key}`).parent().append(`<small class="error_text " style="color:red">${errors[key]}</small>`);
+                $(`#${key}`).css({ 'border-color': 'red' });
+                $(`#${key}`).keyup(function () {
+                    $(this).siblings('.error_text').remove();
+                    $(this).css({ 'border-color': '#ebebeb' })
+                });
+
+                $(`#${key}`).change(function () {
+                    $(this).siblings('.error_text').remove();
+                    $(this).css({ 'border-color': '#ebebeb' })
+                });
+            }
+        })
+    });
+
+    // add column
+    $('#add-column-form').submit(function (e) {
+        e.preventDefault();
+
+        const data = $(this).serialize();
+
+        $.post(addColumnUrl, data, function (data) {
+            $('#columns').append(buildColumn(data));
+        })
+    });
+
 </script>
 {% endblock %}

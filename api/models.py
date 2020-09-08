@@ -77,7 +77,6 @@ class Task(TimeStamp):
 
     task_type = models.CharField(max_length=15, choices=TASK_TYPE, default='Task')
 
-    attachment = models.FileField(null=True, blank=True)
     deadline = models.DateTimeField()
 
     reporter = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tasks')

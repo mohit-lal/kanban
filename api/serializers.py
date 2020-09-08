@@ -52,10 +52,11 @@ class AddMemberSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     deadline = DateSerializer()
+    reporter = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Task
-        fields = ['id', 'task_id', 'title', 'description', 'status', 'priority', 'position', 'task_type', 'attachment', 'deadline', 'reporter']
+        fields = ['id', 'task_id', 'title', 'description', 'status', 'priority', 'position', 'task_type', 'deadline', 'reporter']
 
 class ColumnSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True)
@@ -71,10 +72,12 @@ class ColumnCreateSerializer(serializers.ModelSerializer):
         fields = ['title']
 
 class TaskCreateSerializer(serializers.ModelSerializer):
+    deadline = serializers.DateField(format=None, input_formats=None)
+    reporter = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'status', 'priority', 'task_type', 'attachment', 'deadline']
+        fields = ['title', 'description', 'status', 'priority', 'task_type', 'deadline', 'reporter']
 
 
 class BoardSerializer(serializers.ModelSerializer):
