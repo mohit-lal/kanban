@@ -191,4 +191,15 @@ class BoardDetailAPIView(RetrieveAPIView):
             .filter(visibility=True, deleted_at__isnull=True)\
             .prefetch_related(Prefetch('columns', queryset=Column.objects.filter(deleted_at__isnull=True)))\
             .prefetch_related(Prefetch('columns__tasks', queryset=Task.objects.filter(deleted_at__isnull=True)))
+
+class UserListView(ListAPIView):
+    model = User
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+
+    def get_queryset(self):
+        board = get_object_or_404(Board, pk=self.kwargs.get('pk'), created_by=self.request.user)
+        users = User.objects.exclude(pk__in=[board.members.values_list('pk')]).exclude(pk=self.request.user.pk)
+        return users
            

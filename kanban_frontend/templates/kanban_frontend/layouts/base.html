@@ -67,7 +67,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="{% static 'script.js' %}"></script>
+  <script>
+    const API_ENDPOINT = 'http://localhost:8000/api';
+    const BASE_URL = 'http://localhost:8000';
+
+    $('.logout-btn').click(function (e) {
+      e.preventDefault();
+
+      $.get(`${API_ENDPOINT}/logout`);
+      const url = `{% url 'frontend:index' %}`
+      window.location.href = url;
+    });
+  </script>
   {% block script %}{% endblock %}
 </body>
 

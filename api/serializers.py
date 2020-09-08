@@ -49,6 +49,12 @@ class BoardCreateSerializer(serializers.ModelSerializer):
         model = Board
         fields = ['id', 'title', 'visibility', 'description']
 
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
+
 class AddMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -99,11 +105,12 @@ class TaskCreateSerializer(serializers.ModelSerializer):
 
 class BoardSerializer(serializers.ModelSerializer):
     columns = ColumnSerializer(many=True, read_only=True)
+    members = UserSerializer(many=True)
     # columns = serializers.SerializerMethodField()
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'visibility', 'description', 'columns' ]
+        fields = ['id', 'title', 'visibility', 'description', 'columns', 'members' ]
 
     def get_columns(self, obj):
         return ColumnSerializer(instance=obj.columns.filter(deleted_at__isnull=True), many=True).data
