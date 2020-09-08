@@ -112,6 +112,3 @@ class BoardSerializer(serializers.ModelSerializer):
         model = Board
         fields = ['id', 'title', 'visibility', 'description', 'columns', 'members' ]
 
-    def get_columns(self, obj):
-        return ColumnSerializer(instance=obj.columns.filter(deleted_at__isnull=True), many=True).data
-

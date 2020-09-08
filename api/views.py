@@ -81,7 +81,9 @@ class BoardRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = BoardSerializer
 
     def get_queryset(self):
-        return self.request.user.board_set.filter(pk=self.kwargs.get('pk'), deleted_at__isnull=True)
+        return self.request.user.board_set.filter(pk=self.kwargs.get('pk'), deleted_at__isnull=True)\
+        .prefetch_related(Prefetch('columns', queryset=Column.objects.filter(deleted_at__isnull=True)))\
+        .prefetch_related(Prefetch('columns__tasks', queryset=Task.objects.filter(deleted_at__isnull=True)))
     
 class BoardAddMemberAPIView(RetrieveUpdateAPIView):
     """
