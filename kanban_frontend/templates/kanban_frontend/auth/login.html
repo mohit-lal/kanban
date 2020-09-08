@@ -1,0 +1,34 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
+    <form action="" id="login-form">
+        <div class="form-group">
+            <label>Username: </label>
+            <input type="text" class="form-control" name="username" />
+        </div>
+
+        <div class="form-group">
+            <label>Password: </label>
+            <input type="password" class="form-control" name="password" />
+        </div>
+
+        <button class="btn btn-success btn-login" type="submit" >Login</button>
+    </form>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('#login-form').submit(function(e){
+            e.preventDefault();
+
+            const data = $(this).serialize();
+
+            const url = `${API_ENDPOINT}/login`;
+
+            $.post(url, data, function(data){
+                console.log(data);
+                window.location.href = `{% url 'frontend:my-boards' %}`;
+            })
+        });
+    </script>
+{% endblock %}

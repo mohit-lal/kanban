@@ -1,5 +1,9 @@
 {% extends 'kanban_frontend/layouts/base.html' %}
 
 {% block content %}
-
+    {% if request.user.is_authenticated %}
+        <div class="root"></div>
+    {% else %}
+        <h1 class="text-center pt-5"> Welcome to Kanban </h1>
+    {% endif %}
 {% endblock %}
