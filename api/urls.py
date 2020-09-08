@@ -21,7 +21,4 @@ urlpatterns = [
 
     path('boards', BoardListAPIView.as_view(), name='boards-list'), #shows board the user is member of.
     path('board/<int:pk>', BoardDetailAPIView.as_view(), name='board-detail'), 
-
-
-
 ]

@@ -1,0 +1,39 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="border-bottom pb-1 mb-3">My Projects</h1>
+    <div class="row" id="projects"></div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+    function buildCard(data) {
+        return `
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">${data.title}</h5>
+                <p class="card-text">${data.description}</p>
+                <a data-pk=${data.id} class="btn btn-primary btn-detail">View Detail</a>
+            </div>
+        </div>
+`
+    }
+
+    function buildCardList(boards) {
+        return boards.map((board, i) => buildCard(board));
+    }
+
+    $.get(`{% url 'api:boards-list' %}`, function (data) {
+        console.log(data);
+        $('#projects').append(buildCardList(data));
+    })
+
+    $('body').on('click', '.btn-detail', function(e){
+        const pk = $(this).data('pk');
+        window.location.href = `{% url 'frontend:project-detail' 1234 %}`.replace(1234, pk )
+    })
+</script>
+{% endblock %}

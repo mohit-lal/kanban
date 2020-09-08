@@ -22,3 +22,9 @@ class MyBoardDetailTemplateView(LoginRequired403Mixin, TemplateView):
 
 class MyBoardUpdateTemplateView(LoginRequired403Mixin, TemplateView):
     template_name = 'kanban_frontend/board/board_update.html'
+
+class ProjectTemplateView(LoginRequired403Mixin, TemplateView):
+    template_name = 'kanban_frontend/projects/list.html'
+
+class ProjectDetailTemplateView(LoginRequired403Mixin, TemplateView):
+    template_name = 'kanban_frontend/projects/detail.html'

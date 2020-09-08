@@ -26,18 +26,11 @@
         <td id="title"></td>
     </tr>
     <tr>
-        <td>Visibility</td>
-        <td id="visibility"></td>
-    </tr>
-    <tr>
         <td>Description</td>
         <td id="description"></td>
     </tr>
 </table>
-<a class="btn btn-primary mb-3" id="add-column">Add Column</a>
-<div id="columns" class="row" style="flex-wrap: nowrap; overflow-x: scroll;">
-
-</div>
+<div id="columns" class="row" style="flex-wrap: nowrap; overflow-x: scroll;"></div>
 {% endblock %}
 
 {% block modal %}
@@ -108,34 +101,6 @@
     </div>
 </div>
 
-<!-- Add Column -->
-<div class="modal" tabindex="-1" role="dialog" id="add-column-modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Column</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="" method="POST" id="add-column-form">
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <label for="">Title</label> <small class="text-danger">*</small class="text-danger">
-                        <input type="text" name="title" class="form-control" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-
-        </div>
-    </div>
-</div>
-<!-- ./Add Column Form -->
 {% endblock %}
 
 {% block script %}
@@ -157,8 +122,9 @@
     const current_url = window.location.pathname;
     const pk = current_url.substring(current_url.lastIndexOf('/') + 1);
 
-    const url = `{% url 'api:my-board-retrieve-update-delete' 123 %}`.replace(123, pk);
-    const addColumnUrl = `{% url 'api:my-list-create-columns' 123 %}`.replace(123, pk);
+    const url = `{% url 'api:board-detail' 123 %}`.replace(123, pk);
+
+    // const addColumnUrl = `{% url 'api:my-list-create-columns' 123 %}`.replace(123, pk);
 
     function taskCard(data) {
         return `<div class="task-card">
@@ -200,22 +166,15 @@
     $.get(url, function (data) {
 
         const title = data.title;
-        const visibility = data.visibility;
         const description = data.description;
 
         $('#title').text(title);
-        $('#visibility').text(visibility);
         $('#description').text(description);
 
         const columns = data.columns;
         buildColumns(columns);
 
     })
-
-    $('#add-column').click(function (e) {
-        e.preventDefault();
-        $('#add-column-modal').modal('show');
-    });
 
     $('body').on('click', '.add-task', function (e) {
         $('#add-task-modal').modal('show');
@@ -251,18 +210,5 @@
             }
         })
     });
-
-    // add column
-    $('#add-column-form').submit(function (e) {
-        e.preventDefault();
-
-        const data = $(this).serialize();
-
-        $.post(addColumnUrl, data, function (data) {
-            $('#columns').append(buildColumn(data));
-            $('#add-column-modal').modal('hide');
-        })
-    });
-
 </script>
 {% endblock %}
