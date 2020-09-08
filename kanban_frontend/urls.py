@@ -8,4 +8,7 @@ urlpatterns = [
     path('login', LoginTemplateView.as_view(), name='login'),
 
     path('my/boards', MyBoardTemplateView.as_view(), name='my-boards'),
+    path('my/board/create', MyBoardCreateTemplateView.as_view(), name='my-board-create'),
+    path('my/board/<int:pk>', MyBoardDetailTemplateView.as_view(), name='my-board-detail'),
+    path('my/board/<int:pk>/update', MyBoardUpdateTemplateView.as_view(), name='my-board-update'),
 ]

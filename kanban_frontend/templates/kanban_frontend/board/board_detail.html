@@ -1,0 +1,45 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+{% block head %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% endblock %}
+
+{% block content %}
+<h4 class="mb-3 mt-5">Board Detail</h4>
+<table class="table table-hover" id="board-detail">
+    <tr>
+        <td>Title:</td>
+        <td id="title"></td>
+    </tr>
+    <tr>
+        <td>Visibility</td>
+        <td id="visibility"></td>
+    </tr>
+    <tr>
+        <td>Description</td>
+        <td id="description"></td>
+    </tr>
+</table>
+
+<div id="columns"></div>
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    const current_url = window.location.pathname;
+    const pk = current_url.substring(current_url.lastIndexOf('/') + 1);
+
+    const url = `{% url 'api:my-board-retrieve-update-delete' 123 %}`.replace(123, pk);
+
+    $.get(url, function (data) {
+        const title = data.title;
+        const visibility = data.visibility;
+        const description = data.description;
+
+        $('#title').text(title);
+        $('#visibility').text(visibility);
+        $('#description').text(description);
+
+    })
+</script>
+{% endblock %}

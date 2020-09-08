@@ -78,7 +78,7 @@ class TaskCreateSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
-    columns = ColumnSerializer(many=True)
+    columns = ColumnSerializer(many=True, read_only=True)
     # columns = serializers.SerializerMethodField()
 
     class Meta:

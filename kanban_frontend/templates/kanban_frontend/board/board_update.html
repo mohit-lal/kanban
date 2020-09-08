@@ -1,0 +1,67 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
+<div class="pt-5" id="root">
+    <h4 class="border-bottom mb-3">Create New Board</h4>
+    <form action="" method="POST" id="board-update-form">
+        <div class="form-group">
+            <label for="">Title</label>
+            <input type="text" class="form-control" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="">Visibility</label>
+            <input type="checkbox" name="visibility">
+        </div>
+        <div class="form-group">
+            <label for="">Description</label>
+            <textarea class="form-control" required name="description"></textarea>
+        </div>
+        <button class="btn btn-success btn-create">Create</button>
+        <a class="btn btn-success btn-danger" href="{% url 'frontend:my-boards' %}">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+    const current_url = window.location.pathname;
+    const splitted_url = current_url.split("/");
+    const pk = splitted_url[splitted_url.length - 2]
+
+    const url = `{% url 'api:my-board-retrieve-update-delete' 123 %}`.replace(123, pk);
+
+    $.get(url, function (data) {
+        const title = data.title;
+        const visibility = data.visibility;
+        const description = data.description;
+        console.log(data)
+        $('input[name="title"]').val(title);
+        $('input[name="visibility"]').val(visibility);
+        $('textarea[name="description"]').val(description);
+    })
+
+
+
+
+    $('#board-update-form').submit(function (e) {
+        e.preventDefault();
+
+        const data = $(this).serialize();
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": '{{csrf_token}}' }
+        });
+
+        $.ajax({
+            method: 'PUT',
+            data: data,
+            url: url,
+            success: function (data) {
+                window.location.href = `{% url 'frontend:my-boards' %}`
+            }
+        });
+    });
+</script>
+{% endblock %}

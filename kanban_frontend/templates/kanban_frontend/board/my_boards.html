@@ -1,1 +1,82 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
 <h1>My Boards</h1>
+<a href="{% url 'frontend:my-board-create' %}" class="btn btn-primary">Create Board</a>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>SN</th>
+            <th>Name</th>
+            <th>Visibility</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="board-list">
+
+    </tbody>
+</table>
+{% endblock %}
+
+{% block script %}
+<script>
+
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": '{{csrf_token}}' }
+    });
+
+    function buildBoardlist(boards) {
+        boards.map((board, i) => {
+            $('#board-list').append(`
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${board.title}</td>
+                    <td>${board.visibility}</td>
+                    <td>
+                        <a class="btn btn-primary btn-detail" data-pk=${board.id}>View</a>
+                        <a class="btn btn-info btn-update" data-pk=${board.id}>Edit</a>
+                        <a class="btn btn-danger btn-delete" data-pk=${board.id} >Delete</a>
+                    </td>
+                </tr>
+            `)
+        })
+    }
+
+    // POST handler
+    $.get(`{% url 'api:my-boards-list-create' %}`, function (data) {
+        buildBoardlist(data);
+    })
+
+    // delete handler
+    $('body').on('click', '.btn-delete', function (e) {
+        e.preventDefault();
+        const parent = $(this).parent().parent();
+        const pk = $(this).data('pk');
+
+        $.ajax({
+            method: 'DELETE',
+            url: `{% url 'api:my-board-retrieve-update-delete' 12345%}`.replace(12345, pk),
+            success: function (data) {
+                parent.remove();
+            }
+        });
+    })
+
+    // detail handler
+    $('body').on('click', '.btn-detail', function (e) {
+        e.preventDefault();
+
+        const pk = $(this).data('pk');
+        window.location.href = `{% url 'frontend:my-board-detail' 12345 %}`.replace(12345, pk);
+    })
+
+    //edit handler
+    $('body').on('click', '.btn-update', function (e) {
+        e.preventDefault();
+
+        const pk = $(this).data('pk');
+        window.location.href = `{% url 'frontend:my-board-update' 12345 %}`.replace(12345, pk);
+    })
+</script>
+{% endblock %}

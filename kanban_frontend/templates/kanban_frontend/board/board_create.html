@@ -1,0 +1,44 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
+
+<div class="pt-5">
+    <h4 class="border-bottom mb-3">Create New Board</h4>
+    <form action="" method="POST" id="board-create-form">
+        <div class="form-group">
+            <label for="">Title</label>
+            <input type="text" class="form-control" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="">Visibility</label>
+            <input type="checkbox" name="visibility">
+        </div>
+        <div class="form-group">
+            <label for="">Description</label>
+            <textarea class="form-control" required name="description"></textarea>
+        </div>
+        <button class="btn btn-success btn-create">Create</button>
+        <a class="btn btn-success btn-danger" href="{% url 'frontend:my-boards' %}">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $('#board-create-form').submit(function (e) {
+        e.preventDefault();
+
+        const data = $(this).serialize();
+        const url = `{% url 'api:my-boards-list-create' %}`;
+        
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": '{{csrf_token}}' }
+        });
+
+        $.post(url, data, function (data) {
+            window.location.href = `{% url 'frontend:my-boards' %}`
+        })
+    });
+</script>
+{% endblock %}
