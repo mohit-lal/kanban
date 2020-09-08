@@ -8,6 +8,9 @@ class IndexTemplateView(TemplateView):
 class LoginTemplateView(TemplateView):
     template_name = 'kanban_frontend/auth/login.html'
 
+class RegisterTemplateView(TemplateView):
+    template_name = 'kanban_frontend/auth/register.html'
+
 class MyBoardTemplateView(LoginRequired403Mixin, TemplateView):
     template_name = 'kanban_frontend/board/my_boards.html'
 

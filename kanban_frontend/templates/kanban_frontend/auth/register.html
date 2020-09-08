@@ -1,0 +1,54 @@
+{% extends 'kanban_frontend/layouts/base.html' %}
+
+{% block content %}
+
+<div class="pt-5">
+    <h4 class="border-bottom mb-3">Register</h4>
+    <form action="" method="POST" id="register-form">
+        <div class="form-group">
+            <label for="">Username</label>
+            <input type="text" class="form-control" name="username" required id="username">
+        </div>
+        <div class="form-group">
+            <label for="">Password</label>
+            <input type="password" class="form-control" name="password" required id="password">
+        </div>
+        <div class="form-group">
+            <label for="">Confirm Password</label>
+            <input type="password" class="form-control" name="confirm_password" required id="confirm_password">
+        </div>
+        <button class="btn btn-success btn-create">Register</button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $('#register-form').submit(function (e) {
+        e.preventDefault();
+        const url = `{% url 'api:register'  %}`;
+        const data = $(this).serialize();
+
+        $.post(url, data, function (data) {
+            window.location.href = `{% url 'frontend:my-boards' %}`
+        }).fail(function (response) {
+            $('.error_text').remove();
+            const errors = response.responseJSON;
+            for (let key in errors) {
+                $(`#${key}`).parent().append(`<small class="error_text " style="color:red">${errors[key]}</small>`);
+                $(`#${key}`).css({ 'border-color': 'red' });
+                $(`#${key}`).keyup(function () {
+                    $(this).siblings('.error_text').remove();
+                    $(this).css({ 'border-color': '#ebebeb' })
+                });
+
+                $(`#${key}`).change(function () {
+                    $(this).siblings('.error_text').remove();
+                    $(this).css({ 'border-color': '#ebebeb' })
+                });
+            }
+        })
+    });
+</script>
+{% endblock %}
