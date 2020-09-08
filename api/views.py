@@ -34,6 +34,19 @@ class LoginView(APIView):
 
         return Response({'error':'Username or password incorrect!!'}, 400)
 
+
+class RegisterView(APIView):
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.create_user(username=serializer.data.get('username'), password=serializer.data.get('password'))
+
+        login(request, user)
+        return Response({'status':'ok'}, 200)
+
 class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
 

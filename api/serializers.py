@@ -15,6 +15,23 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
+class RegisterSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'confirm_password']
+
+    def validate(self, data):
+
+        if User.objects.filter(username=data.get('username')).exists():
+            raise serializers.ValidationError({'username': 'Username already exists!'})
+
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError({'password':'Passwords donot match!'})
+
+        return data
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

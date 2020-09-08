@@ -7,6 +7,7 @@ app_name = 'api'
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutAPIView.as_view(), name='logout'),
+    path('register', RegisterView.as_view(), name='register'),
 
     path('my/boards', BoardListCreateAPIView.as_view(), name='my-boards-list-create'), #will only show boards created by logged in user. #done
     path('my/board/<int:pk>', BoardRetrieveUpdateDestroyAPIView.as_view(), name='my-board-retrieve-update-delete'),#done
